@@ -214,7 +214,7 @@
 <!--                                        <status>200..399</status>-->
 <!--                                    </http>-->
                                     <exec>
-                                        <postStart>sh /home/vault/enable-github-auth.sh</postStart>
+                                        <postStart>sh /home/vault/enable-auth.sh</postStart>
                                     </exec>
                                 </wait>
                             </run>
@@ -343,6 +343,30 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>clean-integration-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>docker/vault</directory>
+                                    <includes>
+                                        <include>appRole.properties</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
