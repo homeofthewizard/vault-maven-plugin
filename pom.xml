@@ -77,19 +77,19 @@
         <version.source.plugin>3.0.1</version.source.plugin>
         <version.surefire.plugin>2.22.0</version.surefire.plugin>
         <version.vault>latest</version.vault>
-        <version.vault.driver>5.1.0</version.vault.driver>
         <mockito-core.version>5.2.0</mockito-core.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <junit-jupiter.version>5.9.2</junit-jupiter.version>
         <jackson-databind.version>2.15.2</jackson-databind.version>
+        <vault-java-driver.version>6.0.0</vault-java-driver.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.bettercloud</groupId>
+            <groupId>io.github.jopenlibs</groupId>
             <artifactId>vault-java-driver</artifactId>
-            <version>${version.vault.driver}</version>
+            <version>${vault-java-driver.version}</version>
         </dependency>
         <dependency>
             <groupId>com.deciphernow</groupId>
