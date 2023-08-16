@@ -60,8 +60,6 @@
         <version.compiler.plugin>3.8.1</version.compiler.plugin>
         <version.java.source>11</version.java.source>
         <version.java.target>11</version.java.target>
-        <version.docker.plugin>0.38.0</version.docker.plugin>
-        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.freemarker>2.3.30</version.freemarker>
         <version.guava>32.0.0-jre</version.guava>
         <version.jacoco>0.8.7</version.jacoco>
@@ -76,13 +74,15 @@
         <version.plugin.plugin>3.6.2</version.plugin.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <version.surefire.plugin>2.22.0</version.surefire.plugin>
+        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
+        <version.docker.plugin>0.38.0</version.docker.plugin>
         <version.vault>latest</version.vault>
         <mockito-core.version>5.2.0</mockito-core.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <junit-jupiter.version>5.9.2</junit-jupiter.version>
         <jackson-databind.version>2.15.2</jackson-databind.version>
-        <vault-java-driver.version>6.0.0</vault-java-driver.version>
+        <vault-java-driver.version>6.1.0</vault-java-driver.version>
     </properties>
 
     <dependencies>
@@ -313,13 +313,13 @@
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>${maven.test.runOrder}</runOrder>
-                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                     <includes>
                         <include>**/IntTest*.class</include>
                         <include>**/IntSpec*.class</include>
                     </includes>
                     <systemPropertyVariables>
                         <vault.host>localhost</vault.host>
+<!--                        <vault.host>${docker.nginx.host}</vault.host>-->
                         <vault.port>${docker.nginx.port}</vault.port>
                         <vault.token>${docker.vault.token}</vault.token>
                         <vault.appRole.id>${roleId}</vault.appRole.id>
