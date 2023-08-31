@@ -14,3 +14,6 @@
 # Maven
 log/
 target/
+
+/docker/vault/.cache/*
+/docker/vault/appRole.properties

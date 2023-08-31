@@ -60,41 +60,35 @@
         <version.compiler.plugin>3.8.1</version.compiler.plugin>
         <version.java.source>11</version.java.source>
         <version.java.target>11</version.java.target>
-        <version.docker.plugin>0.38.0</version.docker.plugin>
-        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
-        <version.freemarker>2.3.23</version.freemarker>
-        <version.guava>31.0.1-jre</version.guava>
+        <version.freemarker>2.3.30</version.freemarker>
+        <version.guava>32.0.0-jre</version.guava>
         <version.jacoco>0.8.7</version.jacoco>
         <version.jacoco.plugin>${version.jacoco}</version.jacoco.plugin>
         <version.javadoc.plugin>3.2.0</version.javadoc.plugin>
-        <version.junit>4.13.2</version.junit>
-        <version.maven>3.8.1</version.maven>
-        <version.moby>1.0.0</version.moby>
+        <version.maven>3.9.1</version.maven>
         <version.nginx>1.11</version.nginx>
         <version.plugin.api>3.8.1</version.plugin.api>
         <version.plugin.annotations>3.6.2</version.plugin.annotations>
-        <version.plugin.testing>3.3.0</version.plugin.testing>
+        <version.plugin.testing>4.0.0-alpha-1</version.plugin.testing>
         <version.plugin.plugin>3.6.2</version.plugin.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <version.surefire.plugin>2.22.0</version.surefire.plugin>
-        <version.vault>1.9.2</version.vault>
-        <version.vault.driver>5.1.0</version.vault.driver>
+        <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
+        <version.docker.plugin>0.38.0</version.docker.plugin>
+        <version.vault>latest</version.vault>
         <mockito-core.version>5.2.0</mockito-core.version>
-        <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <junit-jupiter.version>5.9.2</junit-jupiter.version>
+        <jackson-databind.version>2.15.2</jackson-databind.version>
+        <vault-java-driver.version>6.1.0</vault-java-driver.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.bettercloud</groupId>
+            <groupId>io.github.jopenlibs</groupId>
             <artifactId>vault-java-driver</artifactId>
-            <version>${version.vault.driver}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.deciphernow</groupId>
-            <artifactId>moby-dns</artifactId>
-            <version>${version.moby}</version>
-            <scope>test</scope>
+            <version>${vault-java-driver.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -108,9 +102,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${version.junit}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -144,12 +138,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.plugin-testing</groupId>
-            <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>${version.plugin.testing}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-tools-annotations</artifactId>
             <version>${version.plugin.annotations}</version>
@@ -167,6 +155,11 @@
             <version>${version.jacoco}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-databind.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -180,7 +173,7 @@
                     <images>
                         <image>
                             <alias>${docker.vault.host}</alias>
-                            <name>vault:${version.vault}</name>
+                            <name>hashicorp/vault:${version.vault}</name>
                             <run>
                                 <capAdd>
                                     <capAdd>IPC_LOCK</capAdd>
@@ -208,7 +201,7 @@
 <!--                                        <status>200..399</status>-->
 <!--                                    </http>-->
                                     <exec>
-                                        <postStart>sh /home/vault/enable-github-auth.sh</postStart>
+                                        <postStart>sh /home/vault/enable-auth.sh</postStart>
                                     </exec>
                                 </wait>
                             </run>
@@ -254,6 +247,24 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.2.0</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>docker/vault/appRole.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${version.checkstyle.plugin}</version>
@@ -289,18 +300,20 @@
                 <configuration>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <runOrder>${maven.test.runOrder}</runOrder>
-                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                     <includes>
                         <include>**/IntTest*.class</include>
                         <include>**/IntSpec*.class</include>
                     </includes>
                     <systemPropertyVariables>
-                        <vault.host>localhost</vault.host>
+                        <jdk.net.hosts.file>src/test/resources/hosts</jdk.net.hosts.file>
+                        <javax.net.ssl.trustStore>docker/nginx/etc/ssl/truststore.jks</javax.net.ssl.trustStore>
+                        <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
+                        <vault.host>${docker.nginx.host}</vault.host>
                         <vault.port>${docker.nginx.port}</vault.port>
                         <vault.token>${docker.vault.token}</vault.token>
+                        <vault.appRole.id>${roleId}</vault.appRole.id>
+                        <vault.appRole.secret>${secretId}</vault.appRole.secret>
                         <vault.github.token>${docker.vault.github.token}</vault.github.token>
-                        <sun.net.spi.nameservice.provider.1>dns,moby</sun.net.spi.nameservice.provider.1>
-                        <sun.net.spi.nameservice.provider.2>default</sun.net.spi.nameservice.provider.2>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>
@@ -317,6 +330,30 @@
                         <goals>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>clean-integration-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>docker/vault</directory>
+                                    <includes>
+                                        <include>appRole.properties</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -407,7 +444,7 @@
                                         <limit>
                                             <counter>COMPLEXITY</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.50</minimum>
+                                            <minimum>0.80</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -434,7 +471,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release</releaseProfiles>
+                    <releaseProfiles>deploy</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
@@ -443,7 +480,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>deploy</id>
             <build>
                 <plugins>
                     <plugin>

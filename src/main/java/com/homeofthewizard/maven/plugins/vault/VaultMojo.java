@@ -16,17 +16,19 @@
 
 package com.homeofthewizard.maven.plugins.vault;
 
-import com.bettercloud.vault.VaultException;
+import com.homeofthewizard.maven.plugins.vault.client.VaultBackendProvider;
+import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
 import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodFactory;
 import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.OutputMethod;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
+import io.github.jopenlibs.vault.VaultException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
-
 
 /**
  * Provides an abstract class for mojos that work with Vault.
@@ -39,20 +41,39 @@ abstract class VaultMojo extends AbstractMojo {
   @Parameter(required = true)
   protected List<Server> servers;
 
+  @Parameter(defaultValue = "MavenProperties")
+  protected OutputMethod outputMethod;
+
   @Parameter(property = "skipExecution", defaultValue = "false")
   protected boolean skipExecution;
 
-  private final AuthenticationMethodProvider authenticationMethodProvider = new AuthenticationMethodFactory();
+  private final AuthenticationMethodProvider authenticationMethodProvider;
+  protected final VaultClient vaultClient;
+
+  VaultMojo() {
+    this.authenticationMethodProvider = new AuthenticationMethodFactory();
+    var vaultBackendProvider = new VaultBackendProvider();
+    this.vaultClient = VaultClient.createForBackend(vaultBackendProvider);
+  }
+
+  VaultMojo(AuthenticationMethodProvider authenticationMethodProvider,
+            VaultClient vaultClient) {
+    this.authenticationMethodProvider = authenticationMethodProvider;
+    this.vaultClient = vaultClient;
+  }
 
   @Override
   public void execute() throws MojoExecutionException {
+    if (this.skipExecution) {
+      return;
+    }
     executeVaultAuthentication();
     executeVaultOperation();
   }
 
   private void executeVaultAuthentication() throws MojoExecutionException {
     try {
-      Vaults.authenticateIfNecessary(servers, authenticationMethodProvider);
+      vaultClient.authenticateIfNecessary(servers, authenticationMethodProvider);
     } catch (VaultException e) {
       throw new MojoExecutionException("Exception thrown authenticating.", e);
     }

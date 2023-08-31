@@ -1,35 +1,17 @@
-/*
- * Copyright 2017 Decipher Technology Studios LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.homeofthewizard.maven.plugins.vault;
+package com.homeofthewizard.maven.plugins.vault.client;
 
 import static com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodFactory.methods;
 
 import com.google.common.base.Strings;
 
-import com.bettercloud.vault.SslConfig;
-import com.bettercloud.vault.Vault;
-import com.bettercloud.vault.VaultConfig;
-import com.bettercloud.vault.VaultException;
 import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
 import com.homeofthewizard.maven.plugins.vault.config.Mapping;
+import com.homeofthewizard.maven.plugins.vault.config.OutputMethod;
 import com.homeofthewizard.maven.plugins.vault.config.Path;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
+import io.github.jopenlibs.vault.Vault;
+import io.github.jopenlibs.vault.VaultException;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,40 +19,36 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
 
-
 /**
- * Provides static methods for working with Vault.
+ * Provides implementations of operations from {@link VaultClient} to interact with a Vault Server.
+ * Includes static methods for working {@link Vault}.
  */
-public final class Vaults {
+final class Vaults implements VaultClient {
 
-  /**
-   * Defines the timeout when opening a connection with Vault.
-   */
-  private static final int OPEN_TIMEOUT = 5;
-
-  /**
-   * Defines the timeout when reading data from Vault.
-   */
-  private static final int READ_TIMEOUT = 30;
+  private final VaultBackendProvider vaultBackendProvider;
 
   /**
    * Initializes a new instance of the {@link Vaults} class.
    */
-  private Vaults() {}
+  Vaults(VaultBackendProvider vaultBackendProvider) {
+    this.vaultBackendProvider = vaultBackendProvider;
+  }
 
   /**
    * Pulls secrets from one or more Vault servers and paths and updates a {@link Properties} instance with the values.
    *
-   * @param servers the servers
-   * @param properties the properties
+   * @param servers      the servers
+   * @param properties   the properties
+   * @param outputMethod the output method
    * @throws VaultException if an exception is throw pulling the secrets
    */
-  public static void pull(List<Server> servers, Properties properties) throws VaultException {
+  @Override
+  public void pull(List<Server> servers, Properties properties, OutputMethod outputMethod) throws VaultException {
     for (Server server : servers) {
       if (server.isSkipExecution()) {
         continue;
       }
-      Vault vault = vault(server.getUrl(), server.getToken(), server.getNamespace(),
+      Vault vault = vaultBackendProvider.vault(server.getUrl(), server.getToken(), server.getNamespace(),
               server.getSslVerify(), server.getSslCertificate(), server.getEngineVersion());
       for (Path path : server.getPaths()) {
         Map<String, String> secrets = get(vault, path.getName());
@@ -80,6 +58,7 @@ public final class Vaults {
             throw new NoSuchElementException(message);
           }
           properties.setProperty(mapping.getProperty(), secrets.get(mapping.getKey()));
+          outputMethod.flush(properties, secrets, mapping);
         }
       }
     }
@@ -92,12 +71,13 @@ public final class Vaults {
    * @param properties the properties
    * @throws VaultException if an exception is throw pushing the secrets
    */
-  public static void push(List<Server> servers, Properties properties) throws VaultException {
+  @Override
+  public void push(List<Server> servers, Properties properties) throws VaultException {
     for (Server server : servers) {
       if (server.isSkipExecution()) {
         continue;
       }
-      Vault vault = vault(server.getUrl(), server.getToken(), server.getNamespace(),
+      Vault vault = vaultBackendProvider.vault(server.getUrl(), server.getToken(), server.getNamespace(),
               server.getSslVerify(), server.getSslCertificate(), server.getEngineVersion());
       for (Path path : server.getPaths()) {
         Map<String, String> secrets = exists(vault, path.getName()) ? get(vault, path.getName()) : new HashMap<>();
@@ -119,7 +99,8 @@ public final class Vaults {
    * @param servers the servers
    * @throws VaultException if an exception is throw authenticating
    */
-  public static void authenticateIfNecessary(List<Server> servers, AuthenticationMethodProvider factory)
+  @Override
+  public void authenticateIfNecessary(List<Server> servers, AuthenticationMethodProvider factory)
           throws VaultException {
     for (Server s : servers) {
       if (!Strings.isNullOrEmpty(s.getToken())) {
@@ -178,59 +159,6 @@ public final class Vaults {
   private static void set(Vault vault, String path, Map<String, String> secrets) throws VaultException {
     Map<String,Object> nameValuePairs = (Map) secrets;
     vault.logical().write(path, nameValuePairs);
-  }
-
-  /**
-   * Returns a configured instance of the {@link Vault} class.
-   *
-   * @param server the server
-   * @param token the token
-   * @param sslCertificate the certificate file or null if not needed
-   * @param sslVerify {@code true} if the connection should be verified; otherwise, {@code false}
-   * @return the vault
-   */
-  private static Vault vault(String server,
-                             String token,
-                             String namespace,
-                             boolean sslVerify,
-                             File sslCertificate,
-                             Integer engineVersion) throws VaultException {
-
-
-    return new Vault(vaultConfig(server,token,namespace,sslVerify,sslCertificate,engineVersion));
-  }
-
-
-  /**
-   * Returns a configured instance of the {@link VaultConfig} class.
-   * @param server the server
-   * @param token the token
-   * @param namespace the namespace
-   * @param sslVerify {@code true} if the connection should be verified; otherwise, {@code false}
-   * @param sslCertificate the certificate file or null if not needed
-   * @return the vaultConfig
-   */
-  public static VaultConfig vaultConfig(String server,
-                                        String token,
-                                        String namespace,
-                                        boolean sslVerify,
-                                        File sslCertificate,
-                                        Integer engineVersion) throws VaultException {
-    SslConfig sslConfig = new SslConfig().verify(sslVerify);
-    if (sslCertificate != null) {
-      sslConfig.pemFile(sslCertificate);
-    }
-    VaultConfig vaultConfig = new VaultConfig()
-            .address(server)
-            .openTimeout(OPEN_TIMEOUT)
-            .readTimeout(READ_TIMEOUT)
-            .sslConfig(sslConfig)
-            .token(token)
-            .engineVersion(engineVersion);
-    if (!Strings.isNullOrEmpty(namespace)) {
-      vaultConfig.nameSpace(namespace);
-    }
-    return vaultConfig;
   }
 
 }
