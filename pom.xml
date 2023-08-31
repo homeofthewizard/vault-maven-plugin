@@ -138,12 +138,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.plugin-testing</groupId>
-            <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>${version.plugin.testing}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-tools-annotations</artifactId>
             <version>${version.plugin.annotations}</version>
@@ -312,6 +306,8 @@
                     </includes>
                     <systemPropertyVariables>
                         <jdk.net.hosts.file>src/test/resources/hosts</jdk.net.hosts.file>
+                        <javax.net.ssl.trustStore>docker/nginx/etc/ssl/truststore.jks</javax.net.ssl.trustStore>
+                        <javax.net.ssl.trustStorePassword>changeit</javax.net.ssl.trustStorePassword>
                         <vault.host>${docker.nginx.host}</vault.host>
                         <vault.port>${docker.nginx.port}</vault.port>
                         <vault.token>${docker.vault.token}</vault.token>
