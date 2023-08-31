@@ -1,6 +1,7 @@
 package com.homeofthewizard.maven.plugins.vault.client;
 
 import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.OutputMethod;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
 import io.github.jopenlibs.vault.VaultException;
 
@@ -21,7 +22,7 @@ public interface VaultClient {
     return new Vaults(new VaultBackendProvider());
   }
 
-  void pull(List<Server> servers, Properties properties) throws VaultException;
+  void pull(List<Server> servers, Properties properties, OutputMethod outputMethod) throws VaultException;
 
   void push(List<Server> servers, Properties properties) throws VaultException;
 

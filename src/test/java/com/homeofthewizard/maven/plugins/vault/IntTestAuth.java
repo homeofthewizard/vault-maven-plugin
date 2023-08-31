@@ -131,7 +131,7 @@ public class IntTestAuth {
             var client = VaultClient.create();
             try {
                 mojo.execute();
-                client.pull(fixture.servers, properties);
+                client.pull(fixture.servers, properties, OutputMethod.MavenProperties);
                 assertTrue(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());
             } catch (MojoExecutionException exception) {
                 fail(String.format("Unexpected exception while executing: %s", exception.getMessage()));
@@ -161,7 +161,7 @@ public class IntTestAuth {
             var client = VaultClient.create();
             try {
                 mojo.execute();
-                client.pull(fixture.servers, properties);
+                client.pull(fixture.servers, properties, OutputMethod.MavenProperties);
                 assertTrue(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());
             } catch (MojoExecutionException exception) {
                 fail(String.format("Unexpected exception while executing: %s", exception.getMessage()));
@@ -179,6 +179,7 @@ public class IntTestAuth {
             mojo.project = new MavenProject();
             mojo.servers = fixture.servers;
             mojo.skipExecution = false;
+            mojo.outputMethod = OutputMethod.MavenProperties;
             var client = VaultClient.create();
             fixture.properties.stringPropertyNames().forEach(key -> {
                 mojo.project.getProperties().setProperty(key, fixture.properties.getProperty(key));
@@ -203,6 +204,7 @@ public class IntTestAuth {
             mojo.project = new MavenProject();
             mojo.servers = fixture.servers;
             mojo.skipExecution = false;
+            mojo.outputMethod = OutputMethod.MavenProperties;
             var client = VaultClient.create();
             fixture.properties.stringPropertyNames().forEach(key -> {
                 mojo.project.getProperties().setProperty(key, fixture.properties.getProperty(key));
