@@ -16,30 +16,23 @@
 
 package com.homeofthewizard.maven.plugins.vault;
 
-import com.bettercloud.vault.VaultException;
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodFactory;
-import com.homeofthewizard.maven.plugins.vault.config.Mapping;
-import com.homeofthewizard.maven.plugins.vault.config.Path;
-import com.homeofthewizard.maven.plugins.vault.config.Server;
+import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
+import com.homeofthewizard.maven.plugins.vault.config.*;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static com.homeofthewizard.maven.plugins.vault.VaultTestHelper.randomPaths;
+import static org.junit.Assert.*;
 
 public class IntTestPullMojo {
 
@@ -48,24 +41,13 @@ public class IntTestPullMojo {
   private static final String VAULT_PORT = System.getProperty("vault.port", "443");
   private static final String VAULT_SERVER = String.format("https://%s:%s", VAULT_HOST, VAULT_PORT);
   private static final String VAULT_TOKEN = System.getProperty("vault.token");
-  private static final Map<String,String> VAULT_GITHUB_AUTH = Map.of(AuthenticationMethodFactory.GITHUB_TOKEN_TAG, "token");
-
-  private static Mapping randomMapping() {
-    return new Mapping(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+  private static String githubTokenTag = GithubToken.class.getDeclaredFields()[0].getName();
+  private static TreeMap map;
+  static {
+    map = new TreeMap<>();
+    map.put(githubTokenTag,"token");
   }
-
-  private static List<Mapping> randomMappings(int count) {
-    return IntStream.range(0, count).mapToObj(i -> randomMapping()).collect(Collectors.toList());
-  }
-
-  private static Path randomPath(int mappingCount) {
-    return new Path(String.format("secret/%s", UUID.randomUUID().toString()), randomMappings(mappingCount));
-  }
-
-  private static List<Path> randomPaths(int pathCount, int mappingCount) {
-    return IntStream.range(0, pathCount).mapToObj(i -> randomPath(mappingCount)).collect(Collectors.toList());
-  }
-
+  private static final Map<String, TreeMap> VAULT_GITHUB_AUTH = Map.of(AuthenticationMethodFactory.GITHUB_TOKEN_TAG, map);
   private static class Fixture {
 
     private final List<Server> servers;
@@ -104,10 +86,54 @@ public class IntTestPullMojo {
       mojo.project = new MavenProject();
       mojo.servers = fixture.servers;
       mojo.skipExecution = false;
+      mojo.outputMethod = OutputMethod.MavenProperties;
+      var client = VaultClient.create();
       try {
-        Vaults.push(fixture.servers, fixture.properties);
+        client.push(fixture.servers, fixture.properties);
         mojo.execute();
         assertTrue(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());
+      } catch (MojoExecutionException exception) {
+        fail(String.format("Unexpected exception while executing: %s", exception.getMessage()));
+      } catch (VaultException exception) {
+        fail(String.format("Unexpected exception while pushing to Vault: %s", exception.getMessage()));
+      }
+    });
+  }
+
+  @Test
+  public void testExecuteVaultOperation() throws URISyntaxException {
+    IntTestPullMojo.Fixture.with(fixture -> {
+      PullMojo mojo = new PullMojo();
+      mojo.project = new MavenProject();
+      mojo.servers = fixture.servers;
+      mojo.skipExecution = false;
+      mojo.outputMethod = OutputMethod.MavenProperties;
+      var client = VaultClient.create();
+      try {
+        client.push(fixture.servers, fixture.properties);
+        mojo.executeVaultOperation();
+        assertTrue(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());
+      } catch (MojoExecutionException exception) {
+        fail(String.format("Unexpected exception while executing: %s", exception.getMessage()));
+      } catch (VaultException exception) {
+        fail(String.format("Unexpected exception while pushing to Vault: %s", exception.getMessage()));
+      }
+    });
+  }
+
+  @Test
+  public void testDontExecuteVaultOperationIfSkipTrue() throws URISyntaxException {
+    IntTestPullMojo.Fixture.with(fixture -> {
+      PullMojo mojo = new PullMojo();
+      mojo.project = new MavenProject();
+      mojo.servers = fixture.servers;
+      mojo.skipExecution = true;
+      mojo.outputMethod = OutputMethod.MavenProperties;
+      var client = VaultClient.create();
+      try {
+        client.push(fixture.servers, fixture.properties);
+        mojo.executeVaultOperation();
+        assertFalse(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());
       } catch (MojoExecutionException exception) {
         fail(String.format("Unexpected exception while executing: %s", exception.getMessage()));
       } catch (VaultException exception) {

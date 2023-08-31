@@ -16,29 +16,25 @@
 
 package com.homeofthewizard.maven.plugins.vault;
 
-import com.bettercloud.vault.VaultException;
-import com.homeofthewizard.maven.plugins.vault.config.*;
+import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
 import com.homeofthewizard.maven.plugins.vault.config.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import static com.homeofthewizard.maven.plugins.vault.VaultTestHelper.randomPaths;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Provides integration tests for the {@link Vaults} class.
+ * Provides integration tests for the {@link VaultClient} class.
  */
 public class IntTestVaults {
 
@@ -47,24 +43,13 @@ public class IntTestVaults {
   private static final String VAULT_PORT = System.getProperty("vault.port", "443");
   private static final String VAULT_SERVER = String.format("https://%s:%s", VAULT_HOST, VAULT_PORT);
   private static final String VAULT_TOKEN = System.getProperty("vault.token");
-  private static final Map<String,String> VAULT_GITHUB_AUTH = Map.of(AuthenticationMethodFactory.GITHUB_TOKEN_TAG, "token");
-
-  private static Mapping randomMapping() {
-    return new Mapping(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+  private static String githubTokenTag = GithubToken.class.getDeclaredFields()[0].getName();
+  private static TreeMap map;
+  static {
+    map = new TreeMap<>();
+    map.put(githubTokenTag,"token");
   }
-
-  private static List<Mapping> randomMappings(int count) {
-    return IntStream.range(0, count).mapToObj(i -> randomMapping()).collect(Collectors.toList());
-  }
-
-  private static Path randomPath(int mappingCount) {
-    return new Path(String.format("secret/%s", UUID.randomUUID()), randomMappings(mappingCount));
-  }
-
-  private static List<Path> randomPaths(int pathCount, int mappingCount) {
-    return IntStream.range(0, pathCount).mapToObj(i -> randomPath(mappingCount)).collect(Collectors.toList());
-  }
-
+  private static final Map<String, TreeMap> VAULT_GITHUB_AUTH = Map.of(AuthenticationMethodFactory.GITHUB_TOKEN_TAG, map);
   private static class Fixture {
 
     private final AuthenticationMethodProvider authenticationMethodProvider;
@@ -95,18 +80,19 @@ public class IntTestVaults {
   }
 
   /**
-   * Tests the {@link Vaults#pull(List, Properties)} and {@link Vaults#push(List, Properties)} methods.
+   * Tests the {@link VaultClient#pull(List, Properties, OutputMethod)} and {@link VaultClient#push(List, Properties)} methods.
    *
    * @throws URISyntaxException if an exception is raised parsing the certificate
    */
   @Test
   public void testPushAndPull() throws URISyntaxException {
     Fixture.with(fixture -> {
+      var client = VaultClient.create();
       try {
-        Vaults.push(fixture.servers, fixture.properties);
+        client.push(fixture.servers, fixture.properties);
         Properties properties = new Properties();
         try {
-          Vaults.pull(fixture.servers, properties);
+          client.pull(fixture.servers, properties, OutputMethod.MavenProperties);
           assertTrue(Maps.difference(fixture.properties, properties).areEqual());
         } catch (VaultException exception) {
           fail(String.format("Unexpected exception while pulling to Vault: %s", exception.getMessage()));
@@ -118,15 +104,16 @@ public class IntTestVaults {
   }
 
   /**
-   * Tests the {@link Vaults#authenticateIfNecessary(List<Server>, AuthenticationMethodProvider)} method.
+   * Tests the {@link VaultClient#authenticateIfNecessary(List, AuthenticationMethodProvider)}
    *
    * @throws URISyntaxException if an exception is raised parsing the certificate
    */
   @Test
   public void testAuthentication() throws URISyntaxException {
     Fixture.with(fixture -> {
+      var client = VaultClient.create();
       try {
-        Vaults.authenticateIfNecessary(fixture.servers, fixture.authenticationMethodProvider);
+        client.authenticateIfNecessary(fixture.servers, fixture.authenticationMethodProvider);
       } catch (VaultException exception) {
         fail(String.format("Unexpected exception while pushing to Vault: %s", exception.getMessage()));
       }
