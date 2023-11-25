@@ -3,7 +3,9 @@ package com.homeofthewizard.maven.plugins.vault.config;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
@@ -21,7 +23,7 @@ public class TestOutputMethod {
         mavenPropOutMethod.flush(properties, secrets, mapping);
 
         Assertions.assertTrue(properties.containsKey("testPropertyName"));
-        Assertions.assertTrue(properties.getProperty("testPropertyName").equals("testSecretVal"));
+        Assertions.assertEquals("testSecretVal", properties.getProperty("testPropertyName"));
     }
 
     @Test
@@ -29,13 +31,18 @@ public class TestOutputMethod {
         var sysPropOutMethod = OutputMethod.SystemProperties;
         var properties = new Properties();
         var secrets = new HashMap<String, String>();
-        secrets.put("testSecretKey", "testSecretVal");
-        var mapping = new Mapping("testSecretKey", "testPropertyName");
+        secrets.put("testSecretKey1", "testSecretVal1");
+        secrets.put("testSecretKey2", "testSecretVal2");
+        var mapping1 = new Mapping("testSecretKey1", "testPropertyName1");
+        var mapping2 = new Mapping("testSecretKey2", "testPropertyName2");
 
-        sysPropOutMethod.flush(properties, secrets, mapping);
+        sysPropOutMethod.flush(properties, secrets, mapping1);
+        sysPropOutMethod.flush(properties, secrets, mapping2);
 
-        Assertions.assertTrue(System.getProperties().containsKey("testPropertyName"));
-        Assertions.assertTrue(System.getProperty("testPropertyName").equals("testSecretVal"));
+        Assertions.assertTrue(System.getProperties().containsKey("testPropertyName1"));
+        Assertions.assertTrue(System.getProperties().containsKey("testPropertyName2"));
+        Assertions.assertEquals("testSecretVal1", System.getProperty("testPropertyName1"));
+        Assertions.assertEquals("testSecretVal2", System.getProperty("testPropertyName2"));
     }
 
     @Test
@@ -43,13 +50,33 @@ public class TestOutputMethod {
         var envFileOutMethod = OutputMethod.EnvFile;
         var properties = new Properties();
         var secrets = new HashMap<String, String>();
-        secrets.put("testSecretKey", "testSecretVal");
-        var mapping = new Mapping("testSecretKey", "testPropertyName");
+        secrets.put("testSecretKey1", "testSecretVal1");
+        secrets.put("testSecretKey2", "testSecretVal2");
+        var mapping1 = new Mapping("testSecretKey1", "testPropertyName1");
+        var mapping2 = new Mapping("testSecretKey2", "testPropertyName2");
 
-        envFileOutMethod.flush(properties, secrets, mapping);
+        envFileOutMethod.flush(properties, secrets, mapping1);
+        envFileOutMethod.flush(properties, secrets, mapping2);
 
         var envFile = Paths.get(".env").toFile();
         Assertions.assertTrue(envFile.exists());
-        envFile.delete();
+        var createdProps = readEnvFileAndDelete(envFile);
+        Assertions.assertTrue(createdProps.containsKey("testPropertyName1"));
+        Assertions.assertTrue(createdProps.containsKey("testPropertyName2"));
+        Assertions.assertEquals("testSecretVal1", createdProps.getProperty("testPropertyName1"));
+        Assertions.assertEquals("testSecretVal2", createdProps.getProperty("testPropertyName2"));
+    }
+
+    private Properties readEnvFileAndDelete(File envFile) {
+        Properties prop = new Properties();
+        try(InputStream fis = new FileInputStream(envFile)) {
+            prop.load(fis);
+            envFile.delete();
+        }
+        catch(Exception e) {
+            System.out.println("Unable to find the specified properties file");
+            e.printStackTrace();
+        }
+        return prop;
     }
 }
