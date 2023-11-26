@@ -18,7 +18,7 @@ import static com.homeofthewizard.maven.plugins.vault.VaultTestHelper.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class TestVaults {
+public class TestVaultClients {
 
     @Test
     public void testAuthenticationIfNecessaryWithMethod() throws VaultException {
@@ -43,7 +43,7 @@ public class TestVaults {
         var server = new Server("URL", null, false, null, null, "NAMESPACE", List.of(), false, 1);
         var vaultClient = VaultClient.create();
 
-        VaultException ex = Assertions.assertThrows(
+        VaultException ex = assertThrows(
                 VaultException.class,
                 ()-> vaultClient.authenticateIfNecessary(List.of(server), null)
         );
@@ -115,6 +115,26 @@ public class TestVaults {
     }
 
     @Test
+    public void testPullNonexistentSecretKey() throws VaultException {
+        List<Path> paths = randomPaths(10, 10);
+        List<Path> paths2 = randomPaths(10, 10);
+        var server = new Server("URL", null, false, null, null, "NAMESPACE", paths2, false, 1);
+        var vaultBackendProviderMock = Mockito.mock(VaultBackendProvider.class);
+        var vaultMock = createVaultMock(paths);
+        when(vaultBackendProviderMock.vault(any(),any(),any(),anyBoolean(),any(),any())).thenReturn(vaultMock);
+        var vaultClient = VaultClient.createForBackend(vaultBackendProviderMock);
+
+        NoSuchElementException thrown = assertThrows(
+                NoSuchElementException.class,
+                () -> vaultClient.pull(List.of(server), new Properties(), OutputMethod.MavenProperties),
+                "Expected NoSuchElementException to be trown when pulling unexisting secret key, but didn't"
+        );
+
+        assertTrue(thrown.getMessage().contains("No value found in path"));
+        verify(vaultBackendProviderMock, times(1)).vault(any(),any(),any(),anyBoolean(),any(),any());
+    }
+
+    @Test
     public void testPush() throws VaultException {
         List<Path> paths = randomPaths(10, 10);
         var server = new Server("URL", null, false, null, null, "NAMESPACE", paths, false, 1);
@@ -132,6 +152,18 @@ public class TestVaults {
     }
 
     private static Vault createVaultMock(List<Path> paths) throws VaultException {
+        var vaultMock = Mockito.mock(Vault.class);
+        var logicalMock = Mockito.mock(Logical.class);
+        var logicalResponseMock = Mockito.mock(LogicalResponse.class);
+        when(logicalResponseMock.getData()).thenReturn(secretsFromPaths(paths));
+        when(logicalMock.read(any())).thenReturn(logicalResponseMock);
+        when(logicalMock.list(any())).thenReturn(logicalResponseMock);
+        when(logicalMock.write(any(),any())).thenReturn(logicalResponseMock);
+        when(vaultMock.logical()).thenReturn(logicalMock);
+        return vaultMock;
+    }
+
+    private static Vault createVaultMock2(List<Path> paths) throws VaultException {
         var vaultMock = Mockito.mock(Vault.class);
         var logicalMock = Mockito.mock(Logical.class);
         var logicalResponseMock = Mockito.mock(LogicalResponse.class);
