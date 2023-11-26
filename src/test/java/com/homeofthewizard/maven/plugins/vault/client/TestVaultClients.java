@@ -165,16 +165,4 @@ public class TestVaultClients {
         when(vaultMock.logical()).thenReturn(logicalMock);
         return vaultMock;
     }
-
-    private static Vault createVaultMock2(List<Path> paths) throws VaultException {
-        var vaultMock = Mockito.mock(Vault.class);
-        var logicalMock = Mockito.mock(Logical.class);
-        var logicalResponseMock = Mockito.mock(LogicalResponse.class);
-        when(logicalResponseMock.getData()).thenReturn(secretsFromPaths(paths));
-        when(logicalMock.read(any())).thenReturn(logicalResponseMock);
-        when(logicalMock.list(any())).thenReturn(logicalResponseMock);
-        when(logicalMock.write(any(),any())).thenReturn(logicalResponseMock);
-        when(vaultMock.logical()).thenReturn(logicalMock);
-        return vaultMock;
-    }
 }
