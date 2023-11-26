@@ -35,7 +35,7 @@ public enum OutputMethod {
    */
   private static void setEnvFile(Map<String, String> secrets, Mapping mapping) {
     Properties prop = new Properties();
-    try (OutputStream outputStream = new FileOutputStream(".env")) {
+    try (OutputStream outputStream = new FileOutputStream(".env", true)) {
       prop.setProperty(mapping.getProperty(), secrets.get(mapping.getKey()));
       prop.store(outputStream, null);
     } catch (IOException e) {

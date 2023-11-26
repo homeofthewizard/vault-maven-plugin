@@ -15,11 +15,11 @@ import java.util.Properties;
 public interface VaultClient {
 
   static VaultClient createForBackend(VaultBackendProvider vaultBackendProvider) {
-    return new Vaults(vaultBackendProvider);
+    return new JOpenLibsVaultClient(vaultBackendProvider);
   }
 
   static VaultClient create() {
-    return new Vaults(new VaultBackendProvider());
+    return new JOpenLibsVaultClient(new VaultBackendProvider());
   }
 
   void pull(List<Server> servers, Properties properties, OutputMethod outputMethod) throws VaultException;

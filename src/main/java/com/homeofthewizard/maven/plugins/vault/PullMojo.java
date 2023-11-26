@@ -24,7 +24,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * Provides a Mojo that pulls values from Vault and sets Maven properties.
+ * Provides a Mojo that pulls values from Vault and sets values according to the output method selected.
  */
 @Mojo(name = "pull", defaultPhase = LifecyclePhase.INITIALIZE)
 public class PullMojo extends VaultMojo {

@@ -23,23 +23,23 @@ import java.util.Properties;
  * Provides implementations of operations from {@link VaultClient} to interact with a Vault Server.
  * Includes static methods for working {@link Vault}.
  */
-final class Vaults implements VaultClient {
+final class JOpenLibsVaultClient implements VaultClient {
 
   private final VaultBackendProvider vaultBackendProvider;
 
   /**
-   * Initializes a new instance of the {@link Vaults} class.
+   * Initializes a new instance of the {@link JOpenLibsVaultClient} class.
    */
-  Vaults(VaultBackendProvider vaultBackendProvider) {
+  JOpenLibsVaultClient(VaultBackendProvider vaultBackendProvider) {
     this.vaultBackendProvider = vaultBackendProvider;
   }
 
   /**
-   * Pulls secrets from one or more Vault servers and paths and updates a {@link Properties} instance with the values.
+   * Pulls secrets from one or more Vault servers and paths and store the values to the output method selected.
    *
    * @param servers      the servers
    * @param properties   the properties
-   * @param outputMethod the output method
+   * @param outputMethod the output method (maven properties, system properties, or a .env file)
    * @throws VaultException if an exception is throw pulling the secrets
    */
   @Override
@@ -57,7 +57,6 @@ final class Vaults implements VaultClient {
             String message = String.format("No value found in path %s for key %s", path.getName(), mapping.getKey());
             throw new NoSuchElementException(message);
           }
-          properties.setProperty(mapping.getProperty(), secrets.get(mapping.getKey()));
           outputMethod.flush(properties, secrets, mapping);
         }
       }
@@ -153,7 +152,6 @@ final class Vaults implements VaultClient {
    * @param vault the vault
    * @param path the path
    * @param secrets the secrets
-   * @return the data
    * @throws VaultException if an exception is thrown connecting to vault or the path does not exist
    */
   private static void set(Vault vault, String path, Map<String, String> secrets) throws VaultException {
