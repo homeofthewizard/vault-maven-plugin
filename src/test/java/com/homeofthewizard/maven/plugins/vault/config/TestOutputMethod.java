@@ -51,7 +51,7 @@ public class TestOutputMethod {
         var properties = new Properties();
         var secrets = new HashMap<String, String>();
         secrets.put("testSecretKey1", "testSecretVal1");
-        secrets.put("testSecretKey2", "testSecretVal2");
+        secrets.put("testSecretKey2", "testSe@=:/cretVal2");
         var mapping1 = new Mapping("testSecretKey1", "testPropertyName1");
         var mapping2 = new Mapping("testSecretKey2", "testPropertyName2");
 
@@ -64,7 +64,7 @@ public class TestOutputMethod {
         Assertions.assertTrue(createdProps.containsKey("testPropertyName1"));
         Assertions.assertTrue(createdProps.containsKey("testPropertyName2"));
         Assertions.assertEquals("testSecretVal1", createdProps.getProperty("testPropertyName1"));
-        Assertions.assertEquals("testSecretVal2", createdProps.getProperty("testPropertyName2"));
+        Assertions.assertEquals("testSe@=:/cretVal2", createdProps.getProperty("testPropertyName2"));
         Assertions.assertTrue(envFile.delete());
     }
 
