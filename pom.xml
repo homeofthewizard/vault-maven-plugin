@@ -6,7 +6,7 @@
 
     <groupId>com.homeofthewizard</groupId>
     <artifactId>vault-maven-plugin</artifactId>
-    <version>1.1.3-SNAPSHOT</version>
+    <version>1.1.4-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <name>Vault Maven Plugin</name>
@@ -232,14 +232,14 @@
                 <executions>
                     <execution>
                         <id>start</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>none</phase>
                         <goals>
                             <goal>start</goal>
                         </goals>
                     </execution>
                     <execution>
                         <id>stop</id>
-                        <phase>post-integration-test</phase>
+                        <phase>none</phase>
                         <goals>
                             <goal>stop</goal>
                         </goals>
@@ -252,7 +252,7 @@
                 <version>1.2.0</version>
                 <executions>
                     <execution>
-                        <phase>pre-integration-test</phase>
+                        <phase>none</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
@@ -319,7 +319,7 @@
                 <executions>
                     <execution>
                         <id>integration-test</id>
-                        <phase>integration-test</phase>
+                        <phase>none</phase>
                         <goals>
                             <goal>integration-test</goal>
                         </goals>

@@ -1,5 +1,8 @@
 package com.homeofthewizard.maven.plugins.vault;
 
+import com.homeofthewizard.maven.plugins.vault.config.authentication.*;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.approle.AppRoleCredentials;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -185,7 +188,7 @@ public class IntTestAuth {
                 mojo.project.getProperties().setProperty(key, fixture.properties.getProperty(key));
             });
             try {
-                client.authenticateIfNecessary(fixture.servers, fixture.authenticationMethodProvider);
+                client.authenticateIfNecessary(fixture.servers, new AuthenticationSysProperties(), fixture.authenticationMethodProvider);
                 client.push(fixture.servers, fixture.properties);
                 mojo.execute();
                 assertTrue(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());
@@ -210,7 +213,7 @@ public class IntTestAuth {
                 mojo.project.getProperties().setProperty(key, fixture.properties.getProperty(key));
             });
             try {
-                client.authenticateIfNecessary(fixture.servers, fixture.authenticationMethodProvider);
+                client.authenticateIfNecessary(fixture.servers, new AuthenticationSysProperties(), fixture.authenticationMethodProvider);
                 client.push(fixture.servers, fixture.properties);
                 mojo.execute();
                 assertTrue(Maps.difference(fixture.properties, mojo.project.getProperties()).areEqual());

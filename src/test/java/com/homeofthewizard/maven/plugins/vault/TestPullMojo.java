@@ -1,5 +1,8 @@
 package com.homeofthewizard.maven.plugins.vault;
 
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
@@ -41,7 +44,7 @@ public class TestPullMojo {
         List<Path> paths = randomPaths(10, 10);
         var authenticationMethodProvider = Mockito.mock(AuthenticationMethodProvider.class);
         var client = Mockito.mock(VaultClient.class);
-        doNothing().when(client).authenticateIfNecessary(any(),any());
+        doNothing().when(client).authenticateIfNecessary(any(),any(),any());
         doNothing().when(client).pull(any(),any(),any());
 
         var mojo = new PullMojo(authenticationMethodProvider, client);
@@ -52,7 +55,7 @@ public class TestPullMojo {
         mojo.execute();
 
         verify(client, times(0)).pull(any(),any(),any());
-        verify(client, times(0)).authenticateIfNecessary(any(),any());
+        verify(client, times(0)).authenticateIfNecessary(any(),any(),any());
     }
 
     @Test
@@ -60,7 +63,7 @@ public class TestPullMojo {
         List<Path> paths = randomPaths(10, 10);
         var authenticationMethodProvider = Mockito.mock(AuthenticationMethodProvider.class);
         var client = Mockito.mock(VaultClient.class);
-        doNothing().when(client).authenticateIfNecessary(any(),any());
+        doNothing().when(client).authenticateIfNecessary(any(),any(),any());
         doNothing().when(client).pull(any(),any(),any());
 
         var mojo = new PullMojo(authenticationMethodProvider, client);
@@ -71,7 +74,7 @@ public class TestPullMojo {
         mojo.execute();
 
         verify(client, times(1)).pull(any(),any(),any());
-        verify(client, times(1)).authenticateIfNecessary(any(),any());
+        verify(client, times(1)).authenticateIfNecessary(any(),any(),any());
     }
 
     @Test
@@ -113,7 +116,7 @@ public class TestPullMojo {
         List<Path> paths = randomPaths(10, 10);
         var authenticationMethodProvider = Mockito.mock(AuthenticationMethodProvider.class);
         var client = Mockito.mock(VaultClient.class);
-        doThrow(VaultException.class).when(client).authenticateIfNecessary(any(),any());
+        doThrow(VaultException.class).when(client).authenticateIfNecessary(any(),any(),any());
         doNothing().when(client).pull(any(),any(),any());
 
         var mojo = new PullMojo(authenticationMethodProvider, client);
@@ -122,7 +125,7 @@ public class TestPullMojo {
         mojo.skipExecution = false;
 
         Assertions.assertThrows(MojoExecutionException.class, ()-> mojo.execute());
-        verify(client, times(1)).authenticateIfNecessary(any(),any());
+        verify(client, times(1)).authenticateIfNecessary(any(),any(),any());
         verify(client, times(0)).pull(any(),any(),any());
     }
 
@@ -138,7 +141,7 @@ public class TestPullMojo {
         mojo.servers = ImmutableList.of(new Server(VAULT_SERVER, VAULT_TOKEN, true, new File(VAULT_CERTIFICATE.toURI()), VAULT_GITHUB_AUTH, "", paths, false, 2));
         mojo.skipExecution = false;
 
-        var ex = Assertions.assertThrows(MojoExecutionException.class, ()->mojo.executeVaultOperation());
+        var ex = Assertions.assertThrows(MojoExecutionException.class, mojo::executeVaultOperation);
         Assertions.assertTrue(ex.getMessage().contains("Exception thrown pulling secrets."));
     }
 }

@@ -1,5 +1,8 @@
-package com.homeofthewizard.maven.plugins.vault.config;
+package com.homeofthewizard.maven.plugins.vault.config.authentication;
 
+import com.homeofthewizard.maven.plugins.vault.config.Server;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubTokenAuthMethod;
 import io.github.jopenlibs.vault.VaultException;
 import io.github.jopenlibs.vault.api.Auth;
 import io.github.jopenlibs.vault.response.AuthResponse;
