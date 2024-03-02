@@ -100,6 +100,7 @@ then the liquibase plugin will run using the secret!
 No need to handle secrets in the execution environment anymore ! :massage_man:  
 You only need to give set the execution environment's credentials to access Vault!
 
+* * *
 # 2. Maven Applications  
 
 {: .warning }
@@ -276,6 +277,7 @@ Now you just need to run `mvn vault:pull exec:exec`
 The only thing to provide is the token to authenticate to Vault server (`<token>XXXXX</token>`).  
 Isn't that magical ? :mage:
 
+* * *
 # 3. Application that does not use Maven
 Many developers use .env files to manage environment variables on their localhost.  
 It may be the case even on production for application that do not have tools to fetch the secrets directly from a secure shared place like Vault.      

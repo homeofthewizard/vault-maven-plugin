@@ -21,8 +21,8 @@ To include the vault-maven-plugin in your project and use it, add the following 
 This plugin supports pull and pushing Maven project properties from secrets stored in [HashiCorp](https://www.hashicorp.com) [Vault](https://www.vaultproject.io/).
 Inject them in maven's execution, or output as .env file, according to your need.  
 You need to add the appropriate configuration to the plugin so that it will be executed as you want.  
-Follow the below explanations for the different configurations. 
-
+Follow the below explanations for the different configurations.  
+* * *
 ## Pulling Secrets
 In order to pull secrets you must add an execution to the plugin.  
 The following execution will pull secrets from `secret/user` path on the server `https://vault.example.com`.    
@@ -77,7 +77,7 @@ Note that the execution will fail if a specified secret key does not exist and t
 Also note that there is `<outputMethod>` configuration tag that is not used here, that defines how to use the fetched credentials.  
 By default, if you do not define this tag, the secrets will be injected as Maven properties.
 See below on the dedicated part of this configuration for detailed info.
-
+* * *
 ## Pushing Secrets
 In order to pull secrets you must add an execution to the plugin.    
 The following execution will pull secrets from `secret/user` path on the server `https://vault.example.com`.  
@@ -127,7 +127,7 @@ In particular, this configuration will set the value of the `${project.password}
 </build>
 ```
 Note that the execution will fail if a specified project property does not exist and that an existing secret value will be overwritten.
-
+* * *
 ## Authentication
 In order to pull or push secrets you may have to authenticate to the vault, which is generally the case.    
 Using a prefetched token works fine (provided in the `<token>` tag),
@@ -164,9 +164,9 @@ Using a prefetched token works fine (provided in the `<token>` tag),
 </build>
 ```
 
-But if you want to automate the login process as well you can do it via the plugin directly.  
-You can provide the configs under the `<authentication>` tag.
-:warning: You should now remove the `token` tag entirely. An empty token tag is not allowed.
+But if you want to automate the login process as well, you can do it via the plugin directly.   
+You can provide the configs under the `<authentication>` tag.  
+:warning: You should now remove the `token` tag entirely. An empty token tag is not allowed.  
 
 You have the following options enabled currently (others will follow soon):
 * Github PAT
@@ -215,6 +215,14 @@ Use `<githubToken>` under the `<authentication>` tag, as in the following exampl
 
 For general information about github token authentication in hashicorp Vault, see [here](https://developer.hashicorp.com/vault/docs/auth/github).
 
+{: .important }
+If you have multiple environments using different auth methods, and you do not want to define them both in the pom.xml for keeping your config simple,  
+You can also omit this section and provide your config on the cli.
+
+for example:
+```shell
+mvn vaul:pull -D"vault.authenticationMethod=githubToken" -D"vault.github.pat=XXXXXXXXX"
+```
 
 ### How to use AppRole ?
 
@@ -259,7 +267,17 @@ Use `<appRole>` under the `<authentication>` tag, as in the following example.
 
 For general information about AppRole authentication in hashicorp Vault, see [here](https://developer.hashicorp.com/vault/docs/auth/approle).
 
+{: .important }
+If you have multiple environments using different auth methods, and you do not want to define them both in the pom.xml for keeping your config simple,  
+You can also omit this section and provide your config on the cli.
 
+for example:
+```shell
+mvn vaul:pull -D"vault.authenticationMethod=appRole" -D"vault.appRole.roleId=XXXXXXXXX" -D"vault.appRole.secretId=XXXXXXXXX"
+```
+
+
+* * *
 ## How to use the fetched secrets
 There are 3 ways you can use the secrets once they are pulled from Vault server.  
 By giving the corresponding value to the `<outputMethod>` configuration:  
@@ -292,4 +310,13 @@ By giving the corresponding value to the `<outputMethod>` configuration:
         </plugin>
     </plugins>
 </build>
+```
+
+{: .important }
+If you have multiple environments using different output methods, and you do not want to define them both in the pom.xml for keeping your config simple,  
+You can also omit this section and provide your config on the cli.
+
+for example:
+```shell
+mvn vaul:pull -D"vault.outputMethod=EnvFile"
 ```
