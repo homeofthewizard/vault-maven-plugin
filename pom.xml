@@ -232,14 +232,14 @@
                 <executions>
                     <execution>
                         <id>start</id>
-                        <phase>none</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>start</goal>
                         </goals>
                     </execution>
                     <execution>
                         <id>stop</id>
-                        <phase>none</phase>
+                        <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
                         </goals>
@@ -252,7 +252,7 @@
                 <version>1.2.0</version>
                 <executions>
                     <execution>
-                        <phase>none</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
@@ -319,7 +319,7 @@
                 <executions>
                     <execution>
                         <id>integration-test</id>
-                        <phase>none</phase>
+                        <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
                         </goals>

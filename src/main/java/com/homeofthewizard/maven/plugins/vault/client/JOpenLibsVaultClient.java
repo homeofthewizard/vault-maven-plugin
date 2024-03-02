@@ -109,7 +109,8 @@ final class JOpenLibsVaultClient implements VaultClient {
     for (Server s : servers) {
       if (!Strings.isNullOrEmpty(s.getToken())) {
         return;
-      } else if (!authSystemProps.getAuthMethods().get(counter).isEmpty()) {
+      } else if (!authSystemProps.getAuthMethods().isEmpty()
+              && !Objects.isNull(authSystemProps.getAuthMethods().get(counter))) {
         factory.fromSystemProperties(s, authSystemProps, counter).login();
       } else if (!Objects.isNull(s.getAuthentication())) {
         factory.fromServer(s).login();
