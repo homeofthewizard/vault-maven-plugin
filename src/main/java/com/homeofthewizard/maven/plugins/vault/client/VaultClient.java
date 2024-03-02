@@ -1,8 +1,9 @@
 package com.homeofthewizard.maven.plugins.vault.client;
 
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
 import com.homeofthewizard.maven.plugins.vault.config.OutputMethod;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationSysProperties;
 import io.github.jopenlibs.vault.VaultException;
 
 import java.util.List;
@@ -26,5 +27,6 @@ public interface VaultClient {
 
   void push(List<Server> servers, Properties properties) throws VaultException;
 
-  void authenticateIfNecessary(List<Server> servers, AuthenticationMethodProvider factory) throws VaultException;
+  void authenticateIfNecessary(List<Server> servers, AuthenticationSysProperties authSystemArgs,
+                               AuthenticationMethodProvider authenticationMethodProvider) throws VaultException;
 }

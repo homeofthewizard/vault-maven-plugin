@@ -1,4 +1,4 @@
-package com.homeofthewizard.maven.plugins.vault.config;
+package com.homeofthewizard.maven.plugins.vault.config.authentication.github;
 
 import java.io.Serializable;
 

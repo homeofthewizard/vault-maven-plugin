@@ -1,4 +1,4 @@
-package com.homeofthewizard.maven.plugins.vault.config;
+package com.homeofthewizard.maven.plugins.vault.config.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.jopenlibs.vault.VaultException;
@@ -13,9 +13,9 @@ import java.util.Map;
  */
 public abstract class AuthenticationMethod<T> {
 
-  Auth auth;
+  protected Auth auth;
 
-  private Class<T> credentialObjectClass;
+  protected Class<T> credentialObjectClass;
 
   /**
    * Initializes a new instance of the {@link AuthenticationMethod} class.
@@ -36,7 +36,6 @@ public abstract class AuthenticationMethod<T> {
    */
   public T getAuthCredentials(Map<String,String> authMethodMap) {
     ObjectMapper mapper = new ObjectMapper();
-    T credentials = mapper.convertValue(authMethodMap, credentialObjectClass);
-    return credentials;
+    return mapper.convertValue(authMethodMap, credentialObjectClass);
   }
 }

@@ -16,6 +16,10 @@
 
 package com.homeofthewizard.maven.plugins.vault;
 
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationSysProperties;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -30,8 +34,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static com.homeofthewizard.maven.plugins.vault.VaultTestHelper.randomPaths;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Provides integration tests for the {@link VaultClient} class.
@@ -60,13 +64,13 @@ public class IntTestVaults {
       List<Path> paths = randomPaths(10, 10);
       File certificate = new File(VAULT_CERTIFICATE.toURI());
       boolean skipExecution = false;
-      System.out.println(String.format("%s/%s", VAULT_SERVER, VAULT_TOKEN));
+      System.out.printf("%s/%s%n", VAULT_SERVER, VAULT_TOKEN);
       this.servers = ImmutableList.of(new Server(VAULT_SERVER, VAULT_TOKEN, true, certificate, VAULT_GITHUB_AUTH, "", paths, skipExecution, 2));
       this.properties = new Properties();
       this.authenticationMethodProvider = new AuthenticationMethodFactory();
-      this.servers.stream().forEach(server -> {
-        server.getPaths().stream().forEach(path -> {
-          path.getMappings().stream().forEach(mapping -> {
+      this.servers.forEach(server -> {
+        server.getPaths().forEach(path -> {
+          path.getMappings().forEach(mapping -> {
             this.properties.setProperty(mapping.getProperty(), UUID.randomUUID().toString());
           });
         });
@@ -104,7 +108,7 @@ public class IntTestVaults {
   }
 
   /**
-   * Tests the {@link VaultClient#authenticateIfNecessary(List, AuthenticationMethodProvider)}
+   * Tests the {@link VaultClient#authenticateIfNecessary(List, AuthenticationSysProperties, AuthenticationMethodProvider)}
    *
    * @throws URISyntaxException if an exception is raised parsing the certificate
    */
@@ -113,7 +117,7 @@ public class IntTestVaults {
     Fixture.with(fixture -> {
       var client = VaultClient.create();
       try {
-        client.authenticateIfNecessary(fixture.servers, fixture.authenticationMethodProvider);
+        client.authenticateIfNecessary(fixture.servers, new AuthenticationSysProperties(), fixture.authenticationMethodProvider);
       } catch (VaultException exception) {
         fail(String.format("Unexpected exception while pushing to Vault: %s", exception.getMessage()));
       }

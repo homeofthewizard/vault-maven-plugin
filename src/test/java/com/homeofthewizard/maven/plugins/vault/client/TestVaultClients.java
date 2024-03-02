@@ -1,5 +1,9 @@
 package com.homeofthewizard.maven.plugins.vault.client;
 
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethod;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationSysProperties;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import io.github.jopenlibs.vault.Vault;
 import io.github.jopenlibs.vault.VaultException;
 import io.github.jopenlibs.vault.api.Logical;
@@ -38,7 +42,7 @@ public class TestVaultClients {
         when(authenticationProviderMock.fromServer(any())).thenReturn(authenticationMethodMock);
         doNothing().when(authenticationMethodMock).login();
 
-        vaultClient.authenticateIfNecessary(List.of(server), authenticationProviderMock);
+        vaultClient.authenticateIfNecessary(List.of(server), new AuthenticationSysProperties(), authenticationProviderMock);
     }
 
     @Test
@@ -48,7 +52,7 @@ public class TestVaultClients {
 
         VaultException ex = assertThrows(
                 VaultException.class,
-                ()-> vaultClient.authenticateIfNecessary(List.of(server), null)
+                ()-> vaultClient.authenticateIfNecessary(List.of(server), new AuthenticationSysProperties(), null)
         );
         Assertions.assertTrue(ex.getMessage().contains("Either a Token of Authentication method must be provided !!"));
     }
