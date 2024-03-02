@@ -28,7 +28,7 @@ By providing a simple configuration via a `pom.xml`, giving the necessary identi
   
 As a result your application can use its secrets directly from those env variables, which are existing only during it's execution, instead of storing them locally. Which is more secure :policeman:  
 The only thing to manage is the credentials to login into Vault, and the list of secret keys you need :massage_man:.  
-
+* * *
 ## Why and When to use it ?
 Today, most of the software applications are communicating with other applications, using some sort of credentials for identifying themselves before establishing a secure communication,    
 or some encryption keys for securing the communication itself.  
@@ -67,8 +67,8 @@ But it may also be the case that :
 where lots of enterprises still provide Windows PCs without a Docker or K8s.
 
 This plugin aims to help all those cases :santa:.
- 
 
+* * *
 ## Example use cases
 Some CI tools that already working with maven, for example liquibase or sonar-scanner which both have maven plugins,    
 are the best suite for using the Vault Maven Plugin.  

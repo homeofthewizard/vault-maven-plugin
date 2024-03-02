@@ -115,7 +115,7 @@ final class JOpenLibsVaultClient implements VaultClient {
       } else if (!Objects.isNull(s.getAuthentication())) {
         factory.fromServer(s).login();
       } else {
-        throw new VaultException("Either a Token of Authentication method must be provided !!\n"
+        throw new VaultException("Either a Token or Authentication method must be provided !!\n"
                 + "Put in your server configuration in the pom.xml:\n"
                 + "<token>"
                 + "YOUR_VAULT_TOKEN"
