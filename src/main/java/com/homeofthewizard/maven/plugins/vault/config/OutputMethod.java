@@ -1,8 +1,9 @@
 package com.homeofthewizard.maven.plugins.vault.config;
 
-import java.io.FileOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Properties;
 
@@ -22,7 +23,7 @@ public enum OutputMethod {
   EnvFile{
     @Override
     public void flush(Properties properties, Map<String, String> secrets, Mapping mapping) {
-      setEnvFile(secrets, mapping);
+      createEnvFile(secrets, mapping);
     }
   };
 
@@ -33,11 +34,12 @@ public enum OutputMethod {
    * @param secrets secrets fetched from Vault.
    * @param mapping mapping defined in maven project.
    */
-  private static void setEnvFile(Map<String, String> secrets, Mapping mapping) {
-    Properties prop = new Properties();
-    try (OutputStream outputStream = new FileOutputStream(".env", true)) {
-      prop.setProperty(mapping.getProperty(), secrets.get(mapping.getKey()));
-      prop.store(outputStream, null);
+  private static void createEnvFile(Map<String, String> secrets, Mapping mapping) {
+    try (FileWriter fileWriter = new FileWriter(".env", true)) {
+      var buffer = new BufferedWriter(fileWriter);
+      var printer = new PrintWriter(buffer);
+      printer.format("%s=%s\n",mapping.getProperty(),secrets.get(mapping.getKey()));
+      printer.flush();
     } catch (IOException e) {
       e.printStackTrace();
     }

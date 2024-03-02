@@ -17,7 +17,7 @@
 package com.homeofthewizard.maven.plugins.vault;
 
 import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
 import io.github.jopenlibs.vault.VaultException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;

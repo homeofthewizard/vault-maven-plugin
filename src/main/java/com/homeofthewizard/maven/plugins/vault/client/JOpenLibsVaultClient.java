@@ -1,14 +1,15 @@
 package com.homeofthewizard.maven.plugins.vault.client;
 
-import static com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodFactory.methods;
+import static com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory.methods;
 
 import com.google.common.base.Strings;
 
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
 import com.homeofthewizard.maven.plugins.vault.config.Mapping;
 import com.homeofthewizard.maven.plugins.vault.config.OutputMethod;
 import com.homeofthewizard.maven.plugins.vault.config.Path;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationSysProperties;
 import io.github.jopenlibs.vault.Vault;
 import io.github.jopenlibs.vault.VaultException;
 
@@ -99,11 +100,18 @@ final class JOpenLibsVaultClient implements VaultClient {
    * @throws VaultException if an exception is throw authenticating
    */
   @Override
-  public void authenticateIfNecessary(List<Server> servers, AuthenticationMethodProvider factory)
+  public void authenticateIfNecessary(List<Server> servers,
+                                      AuthenticationSysProperties authSystemProps,
+                                      AuthenticationMethodProvider factory)
           throws VaultException {
+
+    var counter = 0;
     for (Server s : servers) {
       if (!Strings.isNullOrEmpty(s.getToken())) {
         return;
+      } else if (!authSystemProps.getAuthMethods().isEmpty()
+              && !Objects.isNull(authSystemProps.getAuthMethods().get(counter))) {
+        factory.fromSystemProperties(s, authSystemProps, counter).login();
       } else if (!Objects.isNull(s.getAuthentication())) {
         factory.fromServer(s).login();
       } else {
@@ -116,8 +124,13 @@ final class JOpenLibsVaultClient implements VaultClient {
                 + "<authentication>\n"
                 + "  <AUTH_METHOD>__AUTH_CREDENTIALS__</AUTH_METHOD>\n"
                 + "</authentication>\n"
-                + "available authentication methods are: " + methods + "\n");
+                + "\n"
+                + "You can also give the credentials as command line arguments:\n"
+                + "-D\"vault.github.pat=<yourPat>\" or -D\"vault.appRole.roleId=<yourRoleId>\"\n"
+                + "\n"
+                + "Available authentication methods are: " + methods + "\n");
       }
+      counter++;
     }
   }
 
