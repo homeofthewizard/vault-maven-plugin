@@ -33,7 +33,7 @@ public class TestVaultClients {
         TreeMap map = new TreeMap<>();
         map.put(githubTokenTag,"token");
         Map<String, TreeMap> vaultGithubToken = Map.of(
-                AuthenticationMethodFactory.APP_ROLE_TAG, map
+                AuthenticationMethodFactory.GITHUB_TOKEN_TAG, map
         );
         var server = new Server("URL", null, false, null, vaultGithubToken, "NAMESPACE", List.of(), false, 1);
         var authenticationProviderMock = Mockito.mock(AuthenticationMethodFactory.class);
@@ -46,7 +46,19 @@ public class TestVaultClients {
     }
 
     @Test
-    public void testAuthenticationIfNecessaryWithoutMethod() {
+    public void testAuthenticationIfNecessaryWithCliArgs() throws VaultException {
+        var server = new Server("URL", null, false, null, null, "NAMESPACE", List.of(), false, 1);
+        var authenticationProviderMock = Mockito.mock(AuthenticationMethodFactory.class);
+        var authenticationMethodMock = Mockito.mock(AuthenticationMethod.class);
+        var vaultClient = VaultClient.create();
+        when(authenticationProviderMock.fromSystemProperties(any(),any(),anyInt())).thenReturn(authenticationMethodMock);
+        doNothing().when(authenticationMethodMock).login();
+
+        vaultClient.authenticateIfNecessary(List.of(server), new AuthenticationSysProperties(List.of(AuthenticationMethodFactory.GITHUB_TOKEN_TAG), List.of(), List.of(), List.of()), authenticationProviderMock);
+    }
+
+    @Test
+    public void testAuthenticationIfNecessaryWithoutMethodNorCliArgs() {
         var server = new Server("URL", null, false, null, null, "NAMESPACE", List.of(), false, 1);
         var vaultClient = VaultClient.create();
 
@@ -54,7 +66,7 @@ public class TestVaultClients {
                 VaultException.class,
                 ()-> vaultClient.authenticateIfNecessary(List.of(server), new AuthenticationSysProperties(), null)
         );
-        Assertions.assertTrue(ex.getMessage().contains("Either a Token of Authentication method must be provided !!"));
+        Assertions.assertTrue(ex.getMessage().contains("Either a Token or Authentication method must be provided !!"));
     }
 
     @Test

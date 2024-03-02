@@ -94,6 +94,7 @@ pipeline {
     }
 }
 ```
+* * *
 
 # 2. Production environments
 Let's say you have an application running on K8s, and you deploy your app and its secrets via a jenkins CD pipeline.
@@ -134,6 +135,7 @@ you can use this plugin to run your application via maven, just like you do in l
 
 If you are interested in all the best practices for managing your secrets on PROD, see the blog post [here](https://homeofthewizard.github.io/secrets-in-java),
 
+* * *
 # 3. Local development environments
 
 If you want to debug your spring application locally, there are two ways to do this:

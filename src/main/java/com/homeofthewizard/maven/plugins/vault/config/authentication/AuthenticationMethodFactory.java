@@ -36,7 +36,9 @@ public final class AuthenticationMethodFactory implements AuthenticationMethodPr
 
   /**
    * Factory method that helps to create the authentication config from arguments given from cli.
+   * @param server Server
    * @param systemProperties AuthenticationSystemProperties
+   * @param counter int
    * @return AuthenticationMethod subclass
    */
   @Override
