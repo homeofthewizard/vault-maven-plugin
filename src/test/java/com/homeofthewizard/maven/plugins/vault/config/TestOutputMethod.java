@@ -60,18 +60,18 @@ public class TestOutputMethod {
 
         var envFile = Paths.get(".env").toFile();
         Assertions.assertTrue(envFile.exists());
-        var createdProps = readEnvFileAndDelete(envFile);
+        var createdProps = readEnvFile(envFile);
         Assertions.assertTrue(createdProps.containsKey("testPropertyName1"));
         Assertions.assertTrue(createdProps.containsKey("testPropertyName2"));
         Assertions.assertEquals("testSecretVal1", createdProps.getProperty("testPropertyName1"));
         Assertions.assertEquals("testSecretVal2", createdProps.getProperty("testPropertyName2"));
+        Assertions.assertTrue(envFile.delete());
     }
 
-    private Properties readEnvFileAndDelete(File envFile) {
+    private Properties readEnvFile(File envFile) {
         Properties prop = new Properties();
         try(InputStream fis = new FileInputStream(envFile)) {
             prop.load(fis);
-            envFile.delete();
         }
         catch(Exception e) {
             System.out.println("Unable to find the specified properties file");
