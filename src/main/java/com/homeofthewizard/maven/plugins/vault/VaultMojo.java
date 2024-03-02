@@ -18,10 +18,11 @@ package com.homeofthewizard.maven.plugins.vault;
 
 import com.homeofthewizard.maven.plugins.vault.client.VaultBackendProvider;
 import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodFactory;
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
 import com.homeofthewizard.maven.plugins.vault.config.OutputMethod;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationSysProperties;
 import io.github.jopenlibs.vault.VaultException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -41,10 +42,22 @@ abstract class VaultMojo extends AbstractMojo {
   @Parameter(required = true)
   protected List<Server> servers;
 
-  @Parameter(defaultValue = "MavenProperties")
+  @Parameter(property = "vault.appRole.roleId")
+  protected List<String> roleIds;
+
+  @Parameter(property = "vault.appRole.secretId")
+  protected List<String> secretIds;
+
+  @Parameter(property = "vault.github.pat")
+  protected List<String> pats;
+
+  @Parameter(property = "vault.authenticationMethod")
+  protected List<String> authMethods;
+
+  @Parameter(defaultValue = "MavenProperties", property = "vault.outputMethod")
   protected OutputMethod outputMethod;
 
-  @Parameter(property = "skipExecution", defaultValue = "false")
+  @Parameter(defaultValue = "false", property = "vault.skipExecution")
   protected boolean skipExecution;
 
   private final AuthenticationMethodProvider authenticationMethodProvider;
@@ -73,7 +86,8 @@ abstract class VaultMojo extends AbstractMojo {
 
   private void executeVaultAuthentication() throws MojoExecutionException {
     try {
-      vaultClient.authenticateIfNecessary(servers, authenticationMethodProvider);
+      var authSystemArgs = new AuthenticationSysProperties(authMethods, pats, roleIds, secretIds);
+      vaultClient.authenticateIfNecessary(servers, authSystemArgs, authenticationMethodProvider);
     } catch (VaultException e) {
       throw new MojoExecutionException("Exception thrown authenticating.", e);
     }

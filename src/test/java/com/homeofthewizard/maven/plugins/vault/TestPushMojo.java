@@ -7,11 +7,11 @@ import static org.mockito.Mockito.*;
 import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.homeofthewizard.maven.plugins.vault.client.VaultClient;
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodFactory;
-import com.homeofthewizard.maven.plugins.vault.config.AuthenticationMethodProvider;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodProvider;
 import com.homeofthewizard.maven.plugins.vault.config.Path;
 import com.homeofthewizard.maven.plugins.vault.config.Server;
-import com.homeofthewizard.maven.plugins.vault.config.GithubToken;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Assertions;
@@ -44,7 +44,7 @@ public class TestPushMojo {
         List<Path> paths = randomPaths(10, 10);
         var authenticationMethodProvider = Mockito.mock(AuthenticationMethodProvider.class);
         var client = Mockito.mock(VaultClient.class);
-        doNothing().when(client).authenticateIfNecessary(any(),any());
+        doNothing().when(client).authenticateIfNecessary(any(),any(),any());
         doNothing().when(client).push(any(),any());
 
         var mojo = new PushMojo(authenticationMethodProvider, client);
@@ -55,7 +55,7 @@ public class TestPushMojo {
         mojo.execute();
 
         verify(client, times(0)).push(any(),any());
-        verify(client, times(0)).authenticateIfNecessary(any(),any());
+        verify(client, times(0)).authenticateIfNecessary(any(),any(),any());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class TestPushMojo {
         List<Path> paths = randomPaths(10, 10);
         var authenticationMethodProvider = Mockito.mock(AuthenticationMethodProvider.class);
         var client = Mockito.mock(VaultClient.class);
-        doNothing().when(client).authenticateIfNecessary(any(),any());
+        doNothing().when(client).authenticateIfNecessary(any(),any(),any());
         doNothing().when(client).push(any(),any());
 
         var mojo = new PushMojo(authenticationMethodProvider, client);
@@ -74,7 +74,7 @@ public class TestPushMojo {
         mojo.execute();
 
         verify(client, times(1)).push(any(),any());
-        verify(client, times(1)).authenticateIfNecessary(any(),any());
+        verify(client, times(1)).authenticateIfNecessary(any(),any(),any());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class TestPushMojo {
         List<Path> paths = randomPaths(10, 10);
         var authenticationMethodProvider = Mockito.mock(AuthenticationMethodProvider.class);
         var client = Mockito.mock(VaultClient.class);
-        doThrow(VaultException.class).when(client).authenticateIfNecessary(any(),any());
+        doThrow(VaultException.class).when(client).authenticateIfNecessary(any(),any(),any());
         doNothing().when(client).push(any(),any());
 
         var mojo = new PushMojo(authenticationMethodProvider, client);
@@ -124,8 +124,8 @@ public class TestPushMojo {
         mojo.servers = ImmutableList.of(new Server(VAULT_SERVER, VAULT_TOKEN, true, new File(VAULT_CERTIFICATE.toURI()), VAULT_GITHUB_AUTH, "", paths, false, 2));
         mojo.skipExecution = false;
 
-        Assertions.assertThrows(MojoExecutionException.class, ()-> mojo.execute());
-        verify(client, times(1)).authenticateIfNecessary(any(),any());
+        Assertions.assertThrows(MojoExecutionException.class, mojo::execute);
+        verify(client, times(1)).authenticateIfNecessary(any(),any(),any());
         verify(client, times(0)).push(any(),any());
     }
 
@@ -143,7 +143,7 @@ public class TestPushMojo {
         mojo.skipExecution = false;
 
         var ex = Assertions.assertThrows(MojoExecutionException.class,
-                ()-> mojo.executeVaultOperation());
+                mojo::executeVaultOperation);
         Assertions.assertTrue(ex.getMessage().contains("Exception thrown pushing secrets."));
     }
 }

@@ -17,6 +17,8 @@
 package com.homeofthewizard.maven.plugins.vault.config;
 
 import com.google.common.testing.EqualsTester;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -24,8 +26,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Provides unit tests for the {@link Server} class.
@@ -100,7 +102,7 @@ public class TestServer {
 
   @Test
   public void testGetEngineVersion() {
-    assertTrue(INSTANCE.getEngineVersion().equals(1));
+    assertEquals(1, (int) INSTANCE.getEngineVersion());
   }
 
   /**
@@ -162,7 +164,7 @@ public class TestServer {
         assertEquals(PATHS, deserialized.getPaths());
         assertEquals(NAMESPACE, deserialized.getNamespace());
         assertEquals(VAULT_GITHUB_AUTH, deserialized.getAuthentication());
-        assertTrue(deserialized.getEngineVersion().equals(1));
+        assertEquals(1, (int) deserialized.getEngineVersion());
         assertEquals(SSL_CERTIFICATE, deserialized.getSslCertificate());
         assertEquals(SSL_VERIFY, deserialized.getSslVerify());
         assertEquals(TOKEN, deserialized.getToken());

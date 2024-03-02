@@ -16,6 +16,8 @@
 
 package com.homeofthewizard.maven.plugins.vault;
 
+import com.homeofthewizard.maven.plugins.vault.config.authentication.AuthenticationMethodFactory;
+import com.homeofthewizard.maven.plugins.vault.config.authentication.github.GithubToken;
 import io.github.jopenlibs.vault.VaultException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -32,7 +34,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static com.homeofthewizard.maven.plugins.vault.VaultTestHelper.randomPaths;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IntTestPushMojo {
 
@@ -56,12 +58,12 @@ public class IntTestPushMojo {
     private Fixture() throws URISyntaxException {
       List<Path> paths = randomPaths(10, 10);
       File certificate = new File(VAULT_CERTIFICATE.toURI());
-      System.out.println(String.format("%s/%s", VAULT_SERVER, VAULT_TOKEN));
+      System.out.printf("%s/%s%n", VAULT_SERVER, VAULT_TOKEN);
       this.servers = ImmutableList.of(new Server(VAULT_SERVER, VAULT_TOKEN, true, certificate, VAULT_GITHUB_AUTH, "", paths, false, 2));
       this.properties = new Properties();
-      this.servers.stream().forEach(server -> {
-        server.getPaths().stream().forEach(path -> {
-          path.getMappings().stream().forEach(mapping -> {
+      this.servers.forEach(server -> {
+        server.getPaths().forEach(path -> {
+          path.getMappings().forEach(mapping -> {
             this.properties.setProperty(mapping.getProperty(), UUID.randomUUID().toString());
           });
         });
@@ -86,7 +88,7 @@ public class IntTestPushMojo {
       mojo.project = new MavenProject();
       mojo.servers = fixture.servers;
       mojo.skipExecution = false;
-      fixture.properties.stringPropertyNames().stream().forEach(key -> {
+      fixture.properties.stringPropertyNames().forEach(key -> {
         mojo.project.getProperties().setProperty(key, fixture.properties.getProperty(key));
       });
       Properties properties = new Properties();
