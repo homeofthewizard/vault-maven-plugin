@@ -13,7 +13,7 @@ To include the vault-maven-plugin in your project and use it, add the following 
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
         </plugin>
     </plugins>
 </build>
@@ -34,7 +34,7 @@ In particular, this configuration will set the value of the `${project.password}
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
             <executions>
                 <execution>
                     <id>pull</id>
@@ -89,7 +89,7 @@ In particular, this configuration will set the value of the `${project.password}
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
             <executions>
                 <execution>
                     <id>push</id>
@@ -138,7 +138,7 @@ Using a prefetched token works fine (provided in the `<token>` tag),
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
             <executions>
                 <execution>
                     <id>pull</id>
@@ -183,7 +183,7 @@ Use `<githubToken>` under the `<authentication>` tag, as in the following exampl
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
             <executions>
                 <execution>
                     <id>pull</id>
@@ -234,7 +234,7 @@ Use `<appRole>` under the `<authentication>` tag, as in the following example.
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
             <executions>
                 <execution>
                     <id>pull</id>
@@ -291,7 +291,7 @@ By giving the corresponding value to the `<outputMethod>` configuration:
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.4</version>
             <executions>
                 <execution>
                     <id>pull</id>
@@ -311,6 +311,7 @@ By giving the corresponding value to the `<outputMethod>` configuration:
     </plugins>
 </build>
 ```
+
 
 {: .important }
 If you have multiple environments using different output methods, and you do not want to define them both in the pom.xml for keeping your config simple,  
