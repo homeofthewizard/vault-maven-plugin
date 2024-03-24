@@ -142,26 +142,28 @@ If you want to debug your spring application locally, there are two ways to do t
 1.  In IntelliJ, you can run and debug maven goals, see [here](https://www.jetbrains.com/help/idea/run-debug-configuration-maven.html).  
     If you want to debug, the catch is not to let spring boot plugin to fork its JVM from the initial maven process. see [here](https://youtrack.jetbrains.com/issue/IDEA-175246)
 
-```xml
-<plugin>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-maven-plugin</artifactId>
-    <configuration>
-        <fork>false</fork>
-    </configuration>
-</plugin>
-```
+    ```xml
+    <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+            <fork>false</fork>
+        </configuration>
+    </plugin>
+    ```
 
-<p><img src="../assets/images/intellij_debug.PNG"/></p>
+    <p><img src="../assets/images/run_config_intellij.PNG"/></p>
 
-2. Or, if you want to fork the JVM and debug only your application, you can set a remote debugger on any IDE by adding spring boot JVM args for the debugger connexion.
+    A working demo project is available [here](https://github.com/HomeOfTheWizard/meeting-organiser).
 
-```xml
-<plugin>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-maven-plugin</artifactId>
-    <configuration>
-        <jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8282</jvmArguments>
-    </configuration>
-</plugin>
-```
+2.  Or, if you want to fork the JVM and debug only your application, you can set a remote debugger on any IDE by adding spring boot JVM args for the debugger connexion.
+
+    ```xml
+    <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+            <jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8282</jvmArguments>
+        </configuration>
+    </plugin>
+    ```
