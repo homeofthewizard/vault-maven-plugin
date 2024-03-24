@@ -59,7 +59,7 @@ You just add the following to fetch the secrets and inject them as properties in
 <plugin>
     <groupId>com.homeofthewizard</groupId>
     <artifactId>vault-maven-plugin</artifactId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.4</version>
     <executions>
         <execution>
             <id>pull</id>
@@ -127,7 +127,7 @@ You can define the following in your pom.xml to fetch the credential for `APPLIC
     <plugin>
         <groupId>com.homeofthewizard</groupId>
         <artifactId>vault-maven-plugin</artifactId>
-        <version>1.1.2-SNAPSHOT</version>
+        <version>1.1.4</version>
         <executions>
             <execution>
                 <id>pull</id>
@@ -224,7 +224,7 @@ By adding the followings to your pom.xml like so:
     <plugin>
         <groupId>com.homeofthewizard</groupId>
         <artifactId>vault-maven-plugin</artifactId>
-        <version>1.1.2-SNAPSHOT</version>
+        <version>1.1.4</version>
         <executions>
             <execution>
                 <id>pull</id>
