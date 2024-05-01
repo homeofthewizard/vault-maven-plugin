@@ -24,8 +24,7 @@
         <connection>scm:git:git@github.com:homeofthewizard/vault-maven-plugin</connection>
         <developerConnection>scm:git:git@github.com:homeofthewizard/vault-maven-plugin.git</developerConnection>
         <url>https://github.com/homeofthewizard/vault-maven-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <snapshotRepository>
