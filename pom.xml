@@ -24,7 +24,6 @@
         <connection>scm:git:git@github.com:homeofthewizard/vault-maven-plugin</connection>
         <developerConnection>scm:git:git@github.com:homeofthewizard/vault-maven-plugin.git</developerConnection>
         <url>https://github.com/homeofthewizard/vault-maven-plugin</url>
-        <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
@@ -42,6 +41,7 @@
     </developers>
 
     <properties>
+        <project.build.outputTimestamp>2024-05-01T00:00:00Z</project.build.outputTimestamp>
         <docker.network>vault-maven-plugin-${maven.build.timestamp}</docker.network>
         <docker.nginx.host>nginx.docker</docker.nginx.host>
         <docker.vault.host>vault.docker</docker.vault.host>
