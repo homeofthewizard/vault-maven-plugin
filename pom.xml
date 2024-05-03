@@ -70,14 +70,14 @@
         <version.plugin.annotations>3.6.2</version.plugin.annotations>
         <version.plugin.testing>4.0.0-alpha-1</version.plugin.testing>
         <version.plugin.plugin>3.6.2</version.plugin.plugin>
-        <version.source.plugin>3.0.1</version.source.plugin>
+        <version.source.plugin>3.2.1</version.source.plugin>
         <version.surefire.plugin>2.22.0</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.docker.plugin>0.38.0</version.docker.plugin>
         <version.vault>latest</version.vault>
         <version.mockito-core>5.2.0</version.mockito-core>
         <version.nexus-staging-maven-plugin>1.6.13</version.nexus-staging-maven-plugin>
-        <version.maven-release-plugin>2.5.3</version.maven-release-plugin>
+        <version.maven-release-plugin>3.0.1</version.maven-release-plugin>
         <version.junit-jupiter>5.9.2</version.junit-jupiter>
         <version.jackson-databind>2.15.2</version.jackson-databind>
         <version.vault-java-driver>6.1.0</version.vault-java-driver>
@@ -163,6 +163,18 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${version.javadoc.plugin}</version>
+                    <configuration>
+                        <notimestamp>true</notimestamp>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>io.fabric8</groupId>
