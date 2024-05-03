@@ -26,7 +26,7 @@ You need to setup an execution phase and configuration.
         <plugin>
             <groupId>com.homeofthewizard</groupId>
             <artifactId>vault-maven-plugin</artifactId>
-            <version>1.1.4</version>
+            <version>1.1.7</version>
             <executions>
                 ...
                 <configuration>
