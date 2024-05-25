@@ -5,6 +5,7 @@
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.homeofthewizard/vault-maven-plugin?label=nexus-snapshots&server=https%3A%2F%2Fs01.oss.sonatype.org)](https://s01.oss.sonatype.org/content/repositories/snapshots/com/homeofthewizard/vault-maven-plugin/)
 [![Maven Central](https://img.shields.io/maven-central/v/com.homeofthewizard/vault-maven-plugin?color=green)](https://central.sonatype.com/artifact/com.homeofthewizard/vault-maven-plugin/1.1.1)
 [![Vault Version](https://img.shields.io/badge/vault-latest-blue?label=vault-version)](https://hub.docker.com/r/hashicorp/vault/tags)
+[![Reproducible Builds](https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96)](https://github.com/jvm-repo-rebuild/reproducible-central#com.homeofthewizard:vault-maven-plugin)
 
 This Maven plugin supports pull and pushing Maven project properties from secrets stored in [HashiCorp](https://www.hashicorp.com) [Vault](https://www.vaultproject.io/).  
   
