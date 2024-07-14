@@ -4,10 +4,12 @@ title: About Vault Maven Plugin
 nav_order: 1
 ---
 
-# No need to store your credentials locally anymore 
+# Maven comes to the rescue to manage your app credentials
 {: .fs-9 }
 
-The Vault Maven Plugin allows you to fetch credentials from HashiCorp Vault and inject them as environment variables. Allowing your program to use them directly, instead of managing the credentials locally on each environment (developpers' local, CI pipelines, or production environment)
+The Vault Maven Plugin allows you to fetch credentials from HashiCorp Vault and make it available to your application.  
+Leveraging maven's portability and its plugin based system,  
+it allows easy integration with your app and can be used as a single tool for all environments (developers’ local, CI pipelines, or production K8s environment).
 {: .fs-6 .fw-300 }
 
 [![Quick Start](https://img.shields.io/badge/-Quick%20Start%20%F0%9F%9A%80-blue?style=for-the-badge&logo=rocket)](/vault-maven-plugin/usage.html)
@@ -30,43 +32,12 @@ As a result your application can use its secrets directly from those env variabl
 The only thing to manage is the credentials to login into Vault, and the list of secret keys you need :massage_man:.  
 * * *
 ## Why and When to use it ?
-Today, most of the software applications are communicating with other applications, using some sort of credentials for identifying themselves before establishing a secure communication,    
-or some encryption keys for securing the communication itself.  
-[Hashicorp Vault](https://www.vaultproject.io/) allows us to securely store those secrets, and share them with necessary counterparts.
-Those counterparts may be developers who want to run the application on their local environments, or the application's different execution environments (Test, Production, CI ect...)  
-
-Organisations that has a Hashicorp Vault, in general, are already using a cloud based architecture.    
-Hence, already have some ways for the application's credentials to be fetched automatically from Vault, instead of storing them locally on each environment separately.  
-Ex: Orchestrated Container environments like Kubernetes,  
-or CI tools like Jenkins have a Vault plugin to do so.  
-
-{: .warning }
-All those plugins/tools, all require you to declare your secrets on their own configuration file, causing duplication among different config files.
-
-{: .important }
-By using this plugin to fetch your secrets, you can unify all your configuration and secrets declaration in a single file, the pom.xml.  
-So everything, except the credentials to vault, can be stored on version control.  
-And if you use Github PAT authentication, even that can be on version control!  
-
-{: .warning }
-The idea behind using those plugins/tools, like jenkins Vault plugin or the Vault Agent that is used to save your secrets on K8s, is to fetch the credentials in advance, so that they are available right away at the start time of your application, making it to boot faster.
-
-{: .important }
-But there are some cases, for example batch applications, where we may prefer to tradeoff for the simplicity of configuration over the speed of startup :massage_man:.  
-Just keep in mind that fetching the secrets in time of execution has an implication of I/O, network and additional time of startup.  
-
-But still If you are sensible to the boot time of your application, lets say you have a web scaling app running on K8s,  
-You can still use this plugin, still with a single definition of your secrets in the pom.xml, to create your secret.yaml for K8s at its deployment time instead of the boot time. :wink:   
-
-
-But it may also be the case that : 
-* Your enterprise's IT infrastructure does not have such tools yet,  
-* It may be in a transition phase, or maybe some legacy applications that are not compatible with such tools.  
-* For some reason even if you have such tools, the Vault plugins are not available.   
-* **Such tools are not available on developers' local environments,**  
-where lots of enterprises still provide Windows PCs without a Docker or K8s.
-
-This plugin aims to help all those cases :santa:.
+An alternative to the [vault agent](https://developer.hashicorp.com/vault/docs/agent-and-proxy/agent) and framework specific tools like [spring-cloud-vault](https://cloud.spring.io/spring-cloud-vault/reference/html/), the project aims to answer use cases that  
+require the separation of the configuration from the component containing the business logic,    
+and require the portability and flexibility of the component managing the secrets,  
+while keeping the necessary configuration for all that as simple as possible (a single pom.xml file).  
+  
+For more details, have a look at the [rationals](rationals.markdown) behind the project.
 
 * * *
 ## Example use cases
