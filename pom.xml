@@ -11,7 +11,7 @@
 
     <name>Vault Maven Plugin</name>
     <description>A plugin that supports retrieving values from HashiCorp Vault.</description>
-    <url>https://github.com/homeofthewizard/vault-maven-plugin</url>
+    <url>https://homeofthewizard.github.io/vault-maven-plugin</url>
 
     <licenses>
         <license>
