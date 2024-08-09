@@ -75,4 +75,4 @@ If you are sensible to the boot time of your application, lets say you have a we
 Keep in mind that fetching the secrets in time of execution has an implication of I/O, network and additional time of startup.
 You can use this plugin to create your secret.yaml for K8s at its deployment time instead of the boot time. :wink:
 
-:rocket: With the speed of mvnd, the execution of this plugin may soon be feasible even at the startup of your pod! see the study on this topic [here](https://github.com/HomeOfTheWizard/vault-mvnd-benchmark). 
+:rocket: With the speed of mvnd, the execution of this plugin may soon be feasible even at the startup of your pod! see the study on this topic [here](https://github.com/HomeOfTheWizard/vault-mvnd-benchmark), and ongoing discussions [here](https://github.com/apache/maven-mvnd/issues/496). 
