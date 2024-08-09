@@ -60,6 +60,8 @@ This plugin aims to help all those cases. :santa:
 | vaul-maven-plugin                                                      |      ✅      |                |              ✅              |            ✅            |
 | **[maven deamon](https://github.com/apache/maven-mvnd)** (coming soon) |      ✅      |       ✅        |              ✅              |            ✅            |
 
+A performance study of the execution of this plugin via mvnd is done [here](https://github.com/HomeOfTheWizard/vault-mvnd-benchmark).
+
 ### Special cases 
 
 {: .warning }
@@ -72,3 +74,5 @@ Another sweet spot for the maven plugin is when you do not use the [dynamic secr
 If you are sensible to the boot time of your application, lets say you have a web scaling app running on K8s. 
 Keep in mind that fetching the secrets in time of execution has an implication of I/O, network and additional time of startup.
 You can use this plugin to create your secret.yaml for K8s at its deployment time instead of the boot time. :wink:
+
+:rocker: With the speed of mvnd, the execution of this plugin may soon be feasible even at the startup of your pod! see the study on this topic [here](https://github.com/HomeOfTheWizard/vault-mvnd-benchmark). 
